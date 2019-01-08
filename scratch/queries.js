@@ -7,7 +7,7 @@ const Note = require('../models/note');
 
 mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
   .then(() => { 
-    const searchTerm = 'in';
+    const searchTerm = 'lady Gaga';
 
     const regex = new RegExp(searchTerm , 'i');
     // let filter = {};
@@ -16,7 +16,7 @@ mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
     // }
     return Note.find({$or : [{title: regex}, {content: regex}]}).sort( {updatedAt :  'desc'});
   })
-  .then( results => console.log(results))
+  .then( results => console.log(JSON.stringify(results)))
   .then(() => {
     return mongoose.disconnect();
   })
