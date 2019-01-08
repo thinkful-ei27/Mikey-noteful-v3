@@ -5,23 +5,25 @@ const { MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
 
-// mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
-//   .then(() => { 
-//     const searchTerm = 'lady Gaga';
-//     let filter = {};
-//     if (searchTerm){
-//       filter.title = { $regex : searchTerm, $options : 'i' };
-//     }
-//     return Note.find(filter).sort( {updatedAt :  'desc'});
-//   })
-//   .then( results => console.log(results[0]))
-//   .then(() => {
-//     return mongoose.disconnect();
-//   })
-//   .catch( err => {
-//     console.error( `ERROR: ${err.message}`);
-//     console.error(err);
-//   });
+mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
+  .then(() => { 
+    const searchTerm = 'in';
+
+    const regex = new RegExp(searchTerm , 'i');
+    // let filter = {};
+    // if (searchTerm){
+    //   filter.title  = { $regex : searchTerm, $options : 'i' } 
+    // }
+    return Note.find({$or : [{title: regex}, {content: regex}]}).sort( {updatedAt :  'desc'});
+  })
+  .then( results => console.log(results))
+  .then(() => {
+    return mongoose.disconnect();
+  })
+  .catch( err => {
+    console.error( `ERROR: ${err.message}`);
+    console.error(err);
+  });
 
 // mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
 //   .then(() => { 
@@ -73,18 +75,18 @@ const Note = require('../models/note');
 //     console.error(err);
 //   });
 
-mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
-  .then(() => { 
-    const searchId = '111111111111111111111101';
+// mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
+//   .then(() => { 
+//     const searchId = '111111111111111111111101';
   
     
-    return Note.findByIdAndRemove(searchId);
-  })
-  .then( results => console.log(results))
-  .then(() => {
-    return mongoose.disconnect();
-  })
-  .catch( err => {
-    console.error( `ERROR: ${err.message}`);
-    console.error(err);
-  });
+//     return Note.findByIdAndRemove(searchId);
+//   })
+//   .then( results => console.log(results))
+//   .then(() => {
+//     return mongoose.disconnect();
+//   })
+//   .catch( err => {
+//     console.error( `ERROR: ${err.message}`);
+//     console.error(err);
+//   });
