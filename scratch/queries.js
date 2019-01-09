@@ -14,16 +14,16 @@ mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
     // if (searchTerm){
     //   filter.title  = { $regex : searchTerm, $options : 'i' } 
     // }
-    return Note.find({$or : [{title: regex}, {content: regex}]}).sort( {updatedAt :  'desc'});
-  })
-  .then( results => console.log(JSON.stringify(results)))
-  .then(() => {
-    return mongoose.disconnect();
-  })
-  .catch( err => {
-    console.error( `ERROR: ${err.message}`);
-    console.error(err);
-  });
+//     return Note.find({$or : [{title: regex}, {content: regex}]}).sort( {updatedAt :  'desc'});
+//   })
+//   .then( results => console.log(JSON.stringify(results)))
+//   .then(() => {
+//     return mongoose.disconnect();
+//   })
+//   .catch( err => {
+//     console.error( `ERROR: ${err.message}`);
+//     console.error(err);
+//   });
 
 // mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
 //   .then(() => { 
@@ -59,21 +59,21 @@ mongoose.connect( MONGODB_URI ,{ useNewUrlParser: true })
 //   });
 
 // mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
-//   .then(() => { 
-//     const searchId ={_id : '111111111111111111111101'};
-//     const updateObj = { title :  'Dont forget gloves its cold'};
+  // .then(() => { 
+  //   const searchId ={_id : '111111111111111111111101'};
+  //   const updateObj = { title :  'Dont forget gloves its cold'};
   
     
-//     return Note.findByIdAndUpdate(searchId, updateObj, {new : true, upsert :true });
-//   })
-//   .then( results => console.log(results))
-//   .then(() => {
-//     return mongoose.disconnect();
-//   })
-//   .catch( err => {
-//     console.error( `ERROR: ${err.message}`);
-//     console.error(err);
-//   });
+  //   return Note.findByIdAndUpdate(searchId, updateObj, {new : true, upsert :true });
+  // })
+  // .then( results => console.log(results))
+  // .then(() => {
+  //   return mongoose.disconnect();
+  // })
+  // .catch( err => {
+  //   console.error( `ERROR: ${err.message}`);
+  //   console.error(err);
+  // });
 
 // mongoose.connect( `${MONGODB_URI}` , { useNewUrlParser: true })
 //   .then(() => { 
