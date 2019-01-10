@@ -10,12 +10,19 @@ router.get('/', (req, res, next) => {
   
   const { searchTerm } =req.query;
   let regex;
+  let filter;
+
   if(searchTerm){
     regex = new RegExp(searchTerm , 'i');
+    filter = {$or : [{title: regex}, {content: regex}]};
   }
-  Note.find({$or : [{},{title: regex}, {content: regex}]})
+  Note.find(filter)
     .sort( {updatedAt :  'desc'})
-    .then( results => res.json(results))
+    .then(results => {
+      if(results){
+        res.json(results);}
+      else next();
+    })
     .catch( err => {
       console.error( `ERROR: ${err.message}`);
       next(err);
@@ -27,7 +34,11 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   
   Note.findById(id)
-    .then( results => res.json(results))
+    .then(results => {
+      if(results){
+        res.json(results);}
+      else next();
+    })
     .catch( err => {
       console.error( `ERROR: ${err.message}`);
       next(err);
@@ -49,7 +60,11 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
   Note.create(newNote)
-    .then( results => res.json(results))
+    .then(results => {
+      if(results){
+        res.json(results);}
+      else next();
+    })
     .catch( err => {
       console.error( `ERROR: ${err.message}`);
       next(err);
@@ -71,7 +86,11 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
   Note.findByIdAndUpdate(updateId, updateNote, {new : true})
-    .then( results => res.json(results))
+    .then(results => {
+      if(results){
+        res.json(results);}
+      else next();
+    })
     .catch( err => {
       console.error( `ERROR: ${err.message}`);
       next(err);
