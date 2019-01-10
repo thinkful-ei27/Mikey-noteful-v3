@@ -2,18 +2,17 @@
 
 const mongoose = require('mongoose');
 
-const noteSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content : String
+const folderSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true},
 });
 
 // Add `createdAt` and `updatedAt` fields
-noteSchema.set('timestamps' , true);
-noteSchema.set('toJSON', {
+folderSchema.set('timestamps' , true);
+folderSchema.set('toJSON', {
   virtuals: true,     // include built-in virtual `id`
   transform: (doc, ret) => {
     delete ret._id; // delete `_id`
     delete ret.__v;
   }
 });
-module.exports = mongoose.model('Note', noteSchema);
+module.exports = mongoose.model('Folder', folderSchema);
