@@ -2,6 +2,7 @@
 const express = require('express');
 
 const Tag  = require('../models/tag');
+const Note  = require('../models/note');
 const router = express.Router();
 
 const mongoose =require('mongoose');
@@ -30,7 +31,7 @@ router.get('/:id', (req, res, next) => {
   let valid =  mongoose.Types.ObjectId.isValid(id);
   
   if(!valid){
-    const err = new Error('MUST post to  valid  folder');
+    const err = new Error('MUST request an existing tag');
     err.status = 400;
     return next(err);
   } 
@@ -63,7 +64,9 @@ router.post('/', (req, res, next) => {
   Tag.create(newTag)
     .then(results => {
       if(results){
-        res.location(`${req.originalUrl}/${results.id}`).status(201).json(results);
+        res
+          .location(`${req.originalUrl}/${results.id}`)
+          .status(201).json(results);
         // res.json(results);
       }
       else next();
@@ -93,7 +96,7 @@ router.put('/:id', (req, res, next) => {
   let valid =  mongoose.Types.ObjectId.isValid(id);
   
   if(!valid){
-    const err = new Error('MUST post to  valid  folder');
+    const err = new Error('MUST include valid tag ids');
     err.status = 400;
     return next(err);
   } 
@@ -116,8 +119,17 @@ router.put('/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
   const id = req.params.id;
-  
-  Tag.findByIdAndRemove(id)
+  const removeTagFromNote = Note
+    .updateMany(
+      { tags : id },
+      { $pull: { tags : id  } }
+    );
+
+  Promise.all([
+    removeTagFromNote,  
+    Tag.findByIdAndRemove(id)
+  ])
+
     .then(()=> res.sendStatus(204))
     .catch( err => {
       console.error( `ERROR: ${err.message}`);
