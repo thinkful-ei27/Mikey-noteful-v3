@@ -4,18 +4,26 @@ const express = require('express');
 
 const Note = require('../models/note');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   
   const { searchTerm } =req.query;
+  const { folderId } =req.query;
+  console.log(req);
   let regex;
-  let filter;
+  let filter = {};
+
+  if (folderId){
+    filter.folderId = folderId;
+  }
 
   if(searchTerm){
     regex = new RegExp(searchTerm , 'i');
-    filter = {$or : [{title: regex}, {content: regex}]};
+    filter.$or = [{'title': regex}, {'content': regex}];
   }
+  
   Note.find(filter)
     .sort( {updatedAt :  'desc'})
     .then(results => {
@@ -48,10 +56,11 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
 
-  const { title, content } = req.body;
+  const { title, content, folderId } = req.body;
   const newNote = {
     title,
-    content
+    content,
+    folderId
   };
 
   if(!newNote.title){
@@ -59,6 +68,17 @@ router.post('/', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
+
+  if(newNote.folderId){
+    let valid =  mongoose.Types.ObjectId.isValid(newNote.folderId);
+     
+    if(!valid){
+      const err = new Error('MUST post to  valid  folder');
+      err.status = 400;
+      return next(err);
+    }
+  }
+
   Note.create(newNote)
     .then(results => {
       if(results){
@@ -73,17 +93,28 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const {title, content } = req.body;
+  const {title, content, folderId } = req.body;
   const id =req.params.id;
   const updateNote ={
     title,
+    folderId,
     content
   };
   const updateId ={ _id : id };
   if(!updateNote.title){
     const err = new Error('Missing `title` in request body');
     err.status = 400;
-    return next(err);
+    return next(err); 
+  }
+
+  if(updateNote.folderId){
+    let valid =  mongoose.Types.ObjectId.isValid(updateNote.folderId);
+     
+    if(!valid){
+      const err = new Error('MUST post to  valid  folder');
+      err.status = 400;
+      return next(err);
+    }
   }
   Note.findByIdAndUpdate(updateId, updateNote, {new : true})
     .then(results => {

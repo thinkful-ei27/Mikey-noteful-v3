@@ -6,7 +6,7 @@ const folderSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true},
 });
 
-// Add `createdAt` and `updatedAt` fields
+// Add `createdAt` and `updatedAt` fieldsb
 folderSchema.set('timestamps' , true);
 folderSchema.set('toJSON', {
   virtuals: true,     // include built-in virtual `id`
