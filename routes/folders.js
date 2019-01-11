@@ -54,7 +54,8 @@ router.post('/', (req, res, next) => {
   Folder.create(newFolder)
     .then(results => {
       if(results){
-        res.json(results);}
+        res.location(`${req.originalUrl}/${results.id}`).status(201).json(results);
+      }
       else next();
     })
     .catch(err => {
