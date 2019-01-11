@@ -10,8 +10,9 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder =require('../models/folder');
 
-const { notes } = require('../db/data');
+const { notes, folders } = require('../db/data');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -24,7 +25,10 @@ describe('Noteful Api resource', function(){
   });
   
   beforeEach(function () {
-    return Note.insertMany(notes);
+    return  Promise.all( 
+      [Folder.insertMany(folders),
+        Folder.createIndexes(),
+        Note.insertMany(notes)]);
   });
   
   afterEach(function () {
@@ -63,7 +67,7 @@ describe('Noteful Api resource', function(){
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res).to.be.an('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'folderId', 'updatedAt');
         
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
@@ -81,7 +85,8 @@ describe('Noteful Api resource', function(){
     it('should create and return a new item when provided valid data', function () {
       const newItem = {
         'title': 'The best article about cats ever!',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
+        'content' : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...',
+        'folderId' : '111111111111111111111101'
       };
 
       let res;
@@ -95,15 +100,17 @@ describe('Noteful Api resource', function(){
          
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content', 'folderId', 'createdAt', 'updatedAt');
           // 2) then call the database
           return Note.findById(res.body.id);
         })
         // 3) then compare the API response to the database results
         .then(data => {
+          console.log(data);
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
+
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
@@ -140,7 +147,8 @@ describe('Noteful Api resource', function(){
     it('should take update data and insert it into the right id', function(){
       const updateData = {
         title: 'dogs',
-        content: 'they bark a lot and are lazy'
+        content: 'they bark a lot and are lazy',
+        folderId : '111111111111111111111101'
       };
       return Note.findOne()
         .then(data => {
