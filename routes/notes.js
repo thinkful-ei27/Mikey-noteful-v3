@@ -26,8 +26,10 @@ router.get('/', (req, res, next) => {
   
   Note.find(filter)
     .sort( {updatedAt :  'desc'})
+    .populate('tags')
     .then(results => {
       if(results){
+      
         res.json(results);}
       else next();
     })
@@ -42,8 +44,10 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   
   Note.findById(id)
+    .populate('tags')
     .then(results => {
       if(results){
+        console.log(results);
         res.json(results);}
       else next();
     })
@@ -56,11 +60,12 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
 
-  const { title, content, folderId } = req.body;
+  const { title, content, folderId, tags } = req.body;
   const newNote = {
     title,
     content,
-    folderId
+    folderId,
+    tags
   };
 
   if(!newNote.title){
@@ -77,6 +82,19 @@ router.post('/', (req, res, next) => {
       err.status = 400;
       return next(err);
     }
+  }
+  if(newNote.tags){
+    let tagArray = newNote.tags;
+    tagArray.forEach(tag => { 
+      let valid =  mongoose.Types.ObjectId.isValid(tag);
+      
+      if(!valid){
+        const err = new Error('Tags not valid');
+        err.status = 400;
+        return next(err);
+      }
+      return;
+    });
   }
 
   Note.create(newNote)
@@ -95,12 +113,13 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const {title, content, folderId } = req.body;
+  const {title, content, folderId, tags } = req.body;
   const id =req.params.id;
   const updateNote ={
     title,
     folderId,
-    content
+    content,
+    tags
   };
   const updateId ={ _id : id };
   if(!updateNote.title){
@@ -117,6 +136,19 @@ router.put('/:id', (req, res, next) => {
       err.status = 400;
       return next(err);
     }
+  }
+  if(updateNote.tags){
+    let tagArray = updateNote.tags;
+    tagArray.forEach(tag => { 
+      let valid =  mongoose.Types.ObjectId.isValid(tag);
+      
+      if(!valid){
+        const err = new Error('Tags not valid :(');
+        err.status = 400;
+        return next(err);
+      }
+      return;
+    });
   }
   Note.findByIdAndUpdate(updateId, updateNote, {new : true})
     .then(results => {

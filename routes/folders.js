@@ -1,14 +1,14 @@
 'use strict';
 const express = require('express');
+const mongoose =require('mongoose');
 
 const Folder  = require('../models/folder');
 const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  
-  
-  
+
+
   Folder.find()
     .sort( {name : 'asc'})
     .then(results => {
@@ -25,6 +25,13 @@ router.get('/', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
+  let valid =  mongoose.Types.ObjectId.isValid(id);
+  
+  if(!valid){
+    const err = new Error('MUST request an existing tag');
+    err.status = 400;
+    return next(err);
+  } 
   
   Folder.findById(id)
     .then(results => {

@@ -10,9 +10,10 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
-const Folder =require('../models/folder');
+const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 
-const { notes, folders } = require('../db/data');
+const { notes, folders, tags } = require('../db/data');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -28,6 +29,8 @@ describe('Noteful Api resource', function(){
     return  Promise.all( 
       [Folder.insertMany(folders),
         Folder.createIndexes(),
+        Tag.insertMany(tags),
+        Tag.createIndexes(),
         Note.insertMany(notes)]);
   });
   
@@ -39,7 +42,7 @@ describe('Noteful Api resource', function(){
     return mongoose.disconnect();
   });
 
-  describe( 'GET /api/notes endpoint', function(){
+  describe.skip( 'GET /api/notes endpoint', function(){
     it(' should return all existing notes', function(){
       return Promise.all([
         Note.find(),
@@ -54,7 +57,7 @@ describe('Noteful Api resource', function(){
     });
   });
 
-  describe( 'GET /api/notes/:id', function(){
+  describe.skip( 'GET /api/notes/:id', function(){
     it('should return the correct note', function(){
       let data;
 
@@ -81,7 +84,7 @@ describe('Noteful Api resource', function(){
 
   });
 
-  describe('POST /api/notes', function () {
+  describe.skip('POST /api/notes', function () {
     it('should create and return a new item when provided valid data', function () {
       const newItem = {
         'title': 'The best article about cats ever!',
