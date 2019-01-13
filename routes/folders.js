@@ -81,6 +81,14 @@ router.put('/:id', (req, res, next) => {
   const updateFolder ={
     name
   };
+
+  let valid =  mongoose.Types.ObjectId.isValid(id);
+  
+  if(!valid){
+    const err = new Error('MUST request an existing folder');
+    err.status = 400;
+    return next(err);
+  } 
   const updateId ={ _id : id };
   if(!updateFolder.name){
     const err = new Error('Missing `name` in request body');
