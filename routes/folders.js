@@ -28,7 +28,7 @@ router.get('/:id', (req, res, next) => {
   let valid =  mongoose.Types.ObjectId.isValid(id);
   
   if(!valid){
-    const err = new Error('MUST request an existing tag');
+    const err = new Error('MUST request an existing folder');
     err.status = 400;
     return next(err);
   } 

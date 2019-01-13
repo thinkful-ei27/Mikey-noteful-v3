@@ -109,7 +109,7 @@ describe('Noteful Api resource', function(){
         })
         // 3) then compare the API response to the database results
         .then(data => {
-          console.log(data);
+          console.log(data.id);
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);

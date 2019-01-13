@@ -90,8 +90,81 @@ describe('Noteful Api resource', function(){
         .then(res =>{
           expect(res).to.have.status(400);
           expect(res).to.be.an('object');
-          expect(res.body.message).to.equal('MUST request an existing tag');
+          expect(res.body.message).to.equal('MUST request an existing folder');
         });
     });
-  }); 
-});
+    it('should give a 404 error for an id that does not exist', function(){
+      return chai.request(app).get('/api/folders/DOESNOTEXIST')
+        .then(res=>{
+          expect(res).to.have.status(404);
+          expect(res).to.be.an('object');
+          expect(res.body.message).to.equal('Not Found');
+
+        });
+    });
+  });
+  describe('POST /api/folders ', function(){
+    it('should create and return a new folder when provided valid data', function(){
+      const newFolder ={
+        name : 'Clown Photos'
+      };
+      
+      let res;
+
+      return chai.request(app)
+        .post('/api/folders/')
+        .send(newFolder)
+        .then(function(_res){
+          res = _res;
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys('id','name','createdAt','updatedAt');
+          
+          return Folder.findById(res.body.id);
+        })
+        .then(function(data){
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(data.name);
+
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);    
+        });
+    });
+    it('should return `no name` error', function(){
+      const newFolder = {};
+      return chai.request(app)
+        .post('/api/folders/')
+        .send(newFolder)
+        .then(function(res){
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.equal('Missing `name` in request body');
+        });
+    });  
+    it('should not allow creation of a duplicate folder name', function(){
+
+      return  Folder.findOne()
+        .then( function(data){
+          let newFolder = {
+            name : data.name
+          };
+          return chai.request(app)
+            .post('/api/folders')
+            .send(newFolder);
+        })    
+        .then(function(res){
+          console.log(res);
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.equal('The folder name already exists');    
+        });
+    });
+  });
+  
+}); 
+
+
+
